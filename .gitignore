@@ -1,0 +1,5 @@
+/static/img/
+/venv/
+*.json
+*.xlsx
+*.exe

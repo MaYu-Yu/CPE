@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>CPE</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='bootstrap-5.3.0-alpha1-dist/css/bootstrap.min.css') }}">
+    <style>
+        /* 表格樣式 */
+        table.table-bordered th,
+        table.table-bordered td {
+            border: 2px solid #000 !important;
+        }
+        td.product-name-cell {
+            white-space: normal !important;
+        }
+        td:not(.product-name-cell) {
+            white-space: nowrap;
+        }
+        tr.is-cheaper {
+            background-color: green;
+            color: black;
+        }        
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="search-container mt-4 mb-4">
+            <form action="{{ url_for('search') }}" method="GET" class="form-inline">
+                <div class="row">
+                    <div class="col-md-6">
+                        <input type="text" name="keyword" class="form-control" placeholder="輸入關鍵字" value="{{ keyword }}">
+                    </div>
+                    <div class="col-md-2">
+                        <input type="submit" value="搜尋" class="btn btn-primary btn-block">
+                    </div>
+                    <div class="col-md-2">
+                        <a href="/" class="btn btn-primary btn-block">瀏覽所有產品</a>
+                    </div>
+                    
+                </div>
+                <div class="row mt-2">
+                    <div class="col-md-12">
+                        <label class="form-check-label">篩選選項：</label>
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="checkbox" name="category_checkbox" {% if 'category_checkbox' in filters %}checked{% endif %}>
+                            <label class="form-check-label">類別</label>
+                        </div>
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="checkbox" name="company_checkbox" {% if 'company_checkbox' in filters %}checked{% endif %}>
+                            <label class="form-check-label">公司</label>
+                        </div>
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="checkbox" name="brand_checkbox" {% if 'brand_checkbox' in filters %}checked{% endif %}>
+                            <label class="form-check-label">品牌</label>
+                        </div>
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="checkbox" name="product_name_checkbox" {% if 'product_name_checkbox' in filters %}checked{% endif %}>
+                            <label class="form-check-label">產品名</label>
+                        </div>
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="checkbox" name="model_checkbox" {% if 'model_checkbox' in filters %}checked{% endif %}>
+                            <label class="form-check-label">型號</label>
+                        </div>
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="checkbox" name="is_cheaper_checkbox" {% if 'is_cheaper_checkbox' in filters %}checked{% endif %}>
+                            <label class="form-check-label">中華電信購買價較便宜</label>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>       
+        
+        <div class="flex-row">
+            <table class="table table-bordered">
+                <thead>
+                    <tr>
+                        <th>圖片</th>
+                        <th>類別</th>
+                        <th>公司</th>
+                        <th>品牌</th>
+                        <th>產品名</th>
+                        <th>型號</th>
+                        <th>中華電信價</th>
+                        <th>網上最便宜</th>
+                        <th>網上最貴</th>
+                        <th>網上中位數</th>
+                        <th>網上產品</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% if products %}
+                        {% for product in products %}
+                            <tr {% if product.is_cheaper %}class="is-cheaper"{% endif %}>
+                                <td>
+                                    {% if product.img_path %}
+                                        <img src="{{ url_for('static', filename='img/' + product.img_path) }}" alt="{{ product.img_path }}" width="100" class="mx-auto d-block">
+                                    {% else %}
+                                        <span>No image available</span>
+                                    {% endif %}
+                                </td>                                
+                                <td>{{ product.category }}</td>
+                                <td>{{ product.company }}</td>
+                                <td>{{ product.brand }}</td>
+                                <td class="product-name-cell">{{ product.product_name }}</td>
+                                <td>{{ product.model }}</td>
+                                <td>{{ product.price }}</td>
+                                <td>{{ product.min_price|int }}</td>
+                                <td>{{ product.max_price|int }}</td>
+                                <td>{{ product.median_price|int }}</td>                           
+                                <td>
+                                    <div class="dropdown">
+                                        <button class="btn btn-primary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                            網上產品
+                                        </button>
+                                        <div class="dropdown-menu">
+                                            {% for i in product.prices %}
+                                                <a class="dropdown-item" href="{{ i[2] }}">{{ i[1] }}${{ i[0]|int }}</a>
+                                            {% endfor %}
+                                        </div>
+                                    </div>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    {% else %}
+                        <tr class="no-results">
+                            <td colspan="10">沒有找到匹配的產品。</td>
+                        </tr>
+                    {% endif %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <script src="{{ url_for('static', filename='bootstrap-5.3.0-alpha1-dist/js/bootstrap.bundle.min.js') }}"></script>
+</body>
+</html>

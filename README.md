@@ -1,0 +1,2 @@
+# market_price_comparison
+讀取excel的產品資料到市場進行比價
